@@ -1,0 +1,24 @@
+# Node.js-related files
+node_modules/         # Dependencies folder
+npm-debug.log         # Debug logs
+yarn.lock             # Yarn lock file (if using Yarn)
+
+# Environment files
+.env                  # Stores sensitive environment variables
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+*.tmp
+*.swp
+
+# System files
+.DS_Store             # macOS Finder metadata
+Thumbs.db             # Windows file explorer metadata
+
+# IDE/Editor-specific files
+.vscode/              # VS Code settings
+.idea/                # JetBrains IDEs settings
+*.iml
