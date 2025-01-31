@@ -3,19 +3,21 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 exports.register = (req, res) => {
-    const { email, password, firstName, lastName } = req.body;
-    const saltRounds = 10;
 
-    // Hash the password
+    const { email, password, firstName, lastName } = req.body;
+
+    if (!email || !password || !firstName || !lastName) {
+        return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    const saltRounds = 10;
     bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
         if (err) return res.status(500).json({ error: 'Error hashing password' });
 
-        // Check if the user already exists
         User.findByEmail(email, (err, results) => {
             if (err) return res.status(500).json({ error: 'Database error' });
             if (results.length > 0) return res.status(400).json({ error: 'Email already registered' });
 
-            // Create the user
             User.create(email, hashedPassword, firstName, lastName, (err, result) => {
                 if (err) return res.status(500).json({ error: 'Error creating user' });
                 res.status(201).json({ message: 'User registered successfully' });
@@ -23,6 +25,7 @@ exports.register = (req, res) => {
         });
     });
 };
+
 
 exports.login = (req, res) => {
     const { email, password } = req.body;
