@@ -6,7 +6,7 @@ const User = {
         connection.query(query, [email], callback);
     },
     create: (email, hashedPassword, firstName, lastName, callback) => {
-        const query = 'INSERT INTO users (email, password, first_name, last_name) VALUES (?, ?, ?, ?)';
+        const query = 'INSERT INTO users (email, password, firstname, lastname) VALUES (?, ?, ?, ?)';
         connection.query(query, [email, hashedPassword, firstName, lastName], callback);
     },
 };
