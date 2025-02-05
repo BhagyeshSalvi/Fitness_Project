@@ -2,48 +2,69 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-exports.register = (req, res) => {
+exports.register = async (req, res) => {
+    try {
+        const { email, password, firstName, lastName } = req.body;
 
-    const { email, password, firstName, lastName } = req.body;
+        if (!email || !password || !firstName || !lastName) {
+            return res.status(400).json({ error: 'All fields are required' });
+        }
 
-    if (!email || !password || !firstName || !lastName) {
-        return res.status(400).json({ error: 'All fields are required' });
+        // Check if email already exists
+        const existingUser = await User.findByEmail(email);
+        if (existingUser.length > 0) {
+            return res.status(400).json({ error: 'Email already registered' });
+        }
+
+        // Hash the password
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+        // Create new user
+        const newUser = await User.create(email, hashedPassword, firstName, lastName);
+        res.status(201).json({ message: 'User registered successfully' });
+
+    } catch (error) {
+        console.error('Register Error:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
-
-    const saltRounds = 10;
-    bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
-        if (err) return res.status(500).json({ error: 'Error hashing password' });
-
-        User.findByEmail(email, (err, results) => {
-            if (err) return res.status(500).json({ error: 'Database error' });
-            if (results.length > 0) return res.status(400).json({ error: 'Email already registered' });
-
-            User.create(email, hashedPassword, firstName, lastName, (err, result) => {
-                if (err) return res.status(500).json({ error: 'Error creating user' });
-                res.status(201).json({ message: 'User registered successfully' });
-            });
-        });
-    });
 };
 
+exports.login = async (req, res) => {
+    try {
+        const email = req.body.email.toLowerCase(); // ✅ Convert input email to lowercase
+        const password = req.body.password;
 
-exports.login = (req, res) => {
-    const { email, password } = req.body;
+        console.log('🔹 Incoming login request for:', email);
 
-    // Check if the user exists
-    User.findByEmail(email, (err, results) => {
-        if (err) return res.status(500).json({ error: 'Database error' });
-        if (results.length === 0) return res.status(401).json({ error: 'Invalid email or password' });
+        const results = await User.findByEmail(email);
+        console.log('🔹 User lookup result:', results);
+
+        if (!results || !Array.isArray(results) || results.length === 0) {
+            console.log('❌ No user found for email:', email);
+            return res.status(401).json({ error: 'Email does not exist' });
+        }
 
         const user = results[0];
 
-        // Compare the hashed password
-        bcrypt.compare(password, user.password, (err, isMatch) => {
-            if (err || !isMatch) return res.status(401).json({ error: 'Invalid email or password' });
+        const isMatch = await bcrypt.compare(password, user.password);
+        console.log('🔹 Password match:', isMatch);
 
-            // Generate a JWT token
-            const token = jwt.sign({ userID: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-            res.json({ message: 'Login successful', token });
-        });
-    });
+        if (!isMatch) {
+            console.log('❌ Incorrect password for:', email);
+            return res.status(401).json({ error: 'Invalid password' });
+        }
+
+        const token = jwt.sign({ userID: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        console.log('✅ Login successful. Token generated:', token);
+
+        res.json({ message: 'Login successful', token });
+
+    } catch (error) {
+        console.error('❌ Login Error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 };
+
+
+
