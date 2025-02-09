@@ -1,21 +1,16 @@
 import React from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
-import { CommonActions } from '@react-navigation/native';
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({ setIsAuthenticated }) => {
   const handleLogout = async () => {
-    await SecureStore.deleteItemAsync('userToken'); // ✅ Remove token
-
-    // ✅ Reset navigation to AuthStack (not just Login)
-    navigation.dispatch(
-      CommonActions.reset({
-        index: 0,
-        routes: [{ name: 'AuthStack' }], // ✅ Ensure 'AuthStack' exists in AppNavigator
-      })
-    );
+    console.log('Logout button pressed'); 
+    await SecureStore.deleteItemAsync('userToken'); // Remove token
+    console.log('Token deleted'); 
+    setIsAuthenticated(false); // Update state to switch to AuthStack
+    console.log('isAuthenticated set to false');
   };
-
+  
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Burnix</Text>

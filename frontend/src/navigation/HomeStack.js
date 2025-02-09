@@ -4,10 +4,12 @@ import HomeScreen from '../screens/Home/HomeScreen';
 
 const Stack = createStackNavigator();
 
-const HomeStack = () => {
+const HomeStack = ({ setIsAuthenticated }) => {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="Home">
+        {(props) => <HomeScreen {...props} setIsAuthenticated={setIsAuthenticated} />}
+      </Stack.Screen>
     </Stack.Navigator>
   );
 };

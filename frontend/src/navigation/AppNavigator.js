@@ -19,7 +19,7 @@ const AppNavigator = () => {
 
   return (
     <NavigationContainer>
-      {isAuthenticated ? <HomeStack /> : <AuthStack setIsAuthenticated={setIsAuthenticated} />}
+      {isAuthenticated ? <HomeStack setIsAuthenticated={setIsAuthenticated} /> : <AuthStack setIsAuthenticated={setIsAuthenticated} />}
     </NavigationContainer>
   );
 };
