@@ -25,7 +25,7 @@ exports.register = async (req, res) => {
         console.log('🔹 New User:', newUser);
         
         // Generate JWT token for the new user
-        const token = jwt.sign({ userID: newUser.insertId }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ userID: newUser.insertId, firstname: firstName }, process.env.JWT_SECRET, { expiresIn: '1h' });
         console.log('🔹 Generated Token:', token);
         res.status(201).json({ message: 'User registered successfully', token});
 
@@ -60,7 +60,7 @@ exports.login = async (req, res) => {
             return res.status(401).json({ error: 'Invalid password' });
         }
 
-        const token = jwt.sign({ userID: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ userID: user.id, firstname: user.firstname }, process.env.JWT_SECRET, { expiresIn: '1h' });
         console.log('✅ Login successful. Token generated:', token);
 
         res.json({ message: 'Login successful', token });
