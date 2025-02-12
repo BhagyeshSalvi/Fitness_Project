@@ -23,6 +23,7 @@ const User = {
                     console.error('❌ Database Error (create):', err);
                     reject(err);
                 } else {
+                    console.log('User Inserted:', result.insertId); // Debugging
                     resolve(result);
                 }
             });

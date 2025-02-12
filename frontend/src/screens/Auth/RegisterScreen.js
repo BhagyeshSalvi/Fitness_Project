@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import axios from 'axios';
 import { API_URL } from '@env';
+import * as SecureStore from 'expo-secure-store';
 
 const RegisterScreen = ({ navigation }) => {
   const [firstName, setFirstName] = useState('');
@@ -31,23 +32,31 @@ const RegisterScreen = ({ navigation }) => {
   };
 
   const handleRegister = async () => {
-    if (emailError || passwordError || !firstName || !lastName || !email || !password) {
-      Alert.alert('Error', 'Please fill out all fields correctly.');
-      return;
-    }
-
     try {
-      await axios.post(`${API_URL}/api/auth/register`, {
-        firstName,
-        lastName,
-        email,
-        password,
-      });
-      navigation.replace('Login'); // Navigate back to Login after registration
+        const response = await axios.post(`${API_URL}/api/auth/register`, {
+            email,
+            password,
+            firstName: firstName, 
+            lastName: lastName,
+        });
+
+        // Check if the backend response has a token
+        if (response.status === 201 && response.data.token) {
+            const { token } = response.data;
+
+            // Save token securely
+            await SecureStore.setItemAsync('userToken', token);
+
+            // Navigate to Personal Details Screen
+            navigation.navigate('PersonalDetails');
+        } else {
+            Alert.alert('Error', 'Unexpected response from server.');
+        }
     } catch (error) {
-      console.error('Registration failed:', error.response?.data);
+        console.error('Registration Error:', error.response?.data || error.message);
+        Alert.alert('Error', error.response?.data?.error || 'Registration failed. Please try again.');
     }
-  };
+};
 
   return (
     <View style={styles.container}>
