@@ -11,21 +11,44 @@ const PersonalDetailsScreen = ({ navigation }) => {
     const [goal, setGoal] = useState('');
 
     const handleNext = () => {
+        // Check if all fields are filled
         if (!gender || !weight || !height || !age || !activityLevel || !goal) {
-            alert('Please fill all fields');
+            alert('Please fill all fields.');
             return;
         }
-
+    
+        // Validate weight
+        const weightValue = parseFloat(weight);
+        if (weightValue < 30 || weightValue > 300) {
+            alert('Please enter a valid weight between 30kg and 300kg.');
+            return;
+        }
+    
+        // Validate height 
+        const heightValue = parseFloat(height);
+        if (heightValue < 1.5 || heightValue > 8) {
+            alert('Please enter a valid height between 1.5 feet and 8 feet.');
+            return;
+        }
+    
+        // Validate age
+        const ageValue = parseInt(age, 10);
+        if (ageValue < 16 || ageValue > 80) {
+            alert('Please enter a valid age between 16 and 80.');
+            return;
+        }
+    
+        // Navigate to the next screen if all validations pass
         navigation.navigate('NutritionRecommendation', {
             gender,
-            weight: parseFloat(weight),
-            height: parseFloat(height),
-            age: parseInt(age, 10),
+            weight: weightValue,
+            height: heightValue,
+            age: ageValue,
             activityLevel,
             goal,
         });
     };
-
+    
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <Text style={styles.title}>Tell Us About Yourself</Text>
