@@ -16,7 +16,12 @@ const WorkoutRecommendationScreen = ({ route, navigation, setIsAuthenticated }) 
                 const response = await axios.get(`${API_URL}/api/workout/recommend/${userId}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                setWorkoutPlan(response.data);
+
+                if (response.data && response.data.plan) {
+                    setWorkoutPlan(response.data);
+                } else {
+                    setWorkoutPlan(null);
+                }
             } catch (error) {
                 console.error('Error fetching workout recommendation:', error);
                 Alert.alert('Error', 'Failed to fetch workout recommendations. Please try again.');
@@ -48,27 +53,27 @@ const WorkoutRecommendationScreen = ({ route, navigation, setIsAuthenticated }) 
         return <Text style={styles.loadingText}>Loading workout recommendations...</Text>;
     }
 
+    if (!workoutPlan || !workoutPlan.plan) {
+        return <Text style={styles.errorText}>No workout plan available.</Text>;
+    }
+
     return (
         <ScrollView contentContainerStyle={styles.container}>
-            <Text style={styles.title}>Recommended Workout Plan</Text>
-            {workoutPlan ? (
-                <>
-                    <Text style={styles.splitText}>Workout Split: {workoutPlan.split}</Text>
-                    {Object.entries(workoutPlan.plan).map(([day, exercises]) => (
-                        <View key={day} style={styles.dayContainer}>
-                            <Text style={styles.dayTitle}>{day}</Text>
-                            {exercises.map((exercise, index) => (
-                                <Text key={index} style={styles.exerciseText}>• {exercise}</Text>
-                            ))}
-                        </View>
+            <Text style={styles.title}>Your Workout Plan</Text>
+            <Text style={styles.splitText}>Workout Split: {workoutPlan.split}</Text>
+
+            {Object.entries(workoutPlan.plan).map(([day, exercises]) => (
+                <View key={day} style={styles.dayContainer}>
+                    <Text style={styles.dayTitle}>{day}</Text>
+                    {exercises.map((exercise, index) => (
+                        <Text key={index} style={styles.exerciseText}>• {exercise}</Text>
                     ))}
-                    <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmPlan}>
-                        <Text style={styles.confirmButtonText}>Confirm Plan</Text>
-                    </TouchableOpacity>
-                </>
-            ) : (
-                <Text style={styles.errorText}>No workout plan available.</Text>
-            )}
+                </View>
+            ))}
+
+            <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmPlan}>
+                <Text style={styles.confirmButtonText}>Confirm Plan</Text>
+            </TouchableOpacity>
         </ScrollView>
     );
 };
