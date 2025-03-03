@@ -61,7 +61,7 @@ const NutritionRecommendationScreen = ({ route, navigation, setIsAuthenticated }
                     Authorization: `Bearer ${token}`, // Pass the token in the header for authentication
                 },
             });
-            setIsAuthenticated(true); //Navigate to homescreen
+            navigation.navigate('WorkoutSelection', { userId });
         } catch (error) {
             console.error('Error saving nutrition data:', error);
             Alert.alert('Error', 'Failed to save nutrition data. Please try again.');
