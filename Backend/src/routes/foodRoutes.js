@@ -14,6 +14,10 @@ router.get("/:userId/:date", foodController.getLoggedFood);
 //Fetch daily macro summary
 router.get("/summary/:userId/:date", foodController.getDailySummary);
 
+//Delete a food entry
+router.delete("/delete", foodController.deleteFood);
+
+
 
 
 

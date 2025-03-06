@@ -81,7 +81,44 @@ const Food = {
                 }
             });
         });
-    }
-};
+    },
 
+
+    //Delete a food entry & update daily summary
+    deleteFoodEntry: (userId, foodId, date) => {
+        return new Promise((resolve, reject) => {
+            // 1️⃣ Find the food entry
+            const findQuery = `SELECT * FROM food_entries WHERE id = ? AND user_id = ? AND date = ?`;
+            connection.query(findQuery, [foodId, userId, date], (err, results) => {
+                if (err) {
+                    console.error("❌ Database Error (deleteFoodEntry - Find Entry):", err);
+                    return reject(err);
+                }
+                if (results.length === 0) {
+                    return reject({ message: "Food entry not found" });
+                }
+    
+                // 2️⃣ Delete the food entry
+                const deleteFoodQuery = `DELETE FROM food_entries WHERE id = ?`;
+                connection.query(deleteFoodQuery, [foodId], (err) => {
+                    if (err) {
+                        console.error("❌ Database Error (deleteFoodEntry - Delete Entry):", err);
+                        return reject(err);
+                    }
+    
+                    // 3️⃣ Delete only the corresponding entry from daily_summary with the same foodId
+                    const deleteSummaryQuery = `DELETE FROM daily_summary WHERE id = ?`;
+                    connection.query(deleteSummaryQuery, [foodId], (err) => {
+                        if (err) {
+                            console.error("❌ Database Error (deleteFoodEntry - Delete Summary):", err);
+                            return reject(err);
+                        }
+                        resolve({ message: "Food entry and corresponding summary entry deleted successfully" });
+                    });
+                });
+            });
+        });
+    }
+    
+};
 module.exports = Food;

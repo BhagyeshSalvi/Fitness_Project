@@ -113,6 +113,25 @@ exports.getDailySummary = async (req, res) => {
     }
 };
 
+exports.deleteFood = async (req, res) => {
+    try {
+        const { userId, foodId, date } = req.body;
+
+        //Call the model function to delete food entry
+        const result = await Food.deleteFoodEntry(userId, foodId, date);
+
+        res.status(200).json(result);
+    } catch (error) {
+        console.error("❌ Error deleting food:", error);
+        
+        if (error.message === "Food entry not found") {
+            return res.status(404).json({ error: "Food entry not found" });
+        }
+
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
 
 
 // ✅ Format Nutritionix API Response
