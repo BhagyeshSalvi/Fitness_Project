@@ -6,24 +6,44 @@ const Food = require("../models/Food");
 exports.searchFood = async (req, res) => {
     try {
         const { query } = req.params;
+        
+        // Check if query is a barcode (numeric value)
+        const isBarcode = /^[0-9]+$/.test(query);
 
-        // ✅ 1. First, Try Searching in Nutritionix API
-        const nutritionixResponse = await axios.post(
-            "https://trackapi.nutritionix.com/v2/natural/nutrients",
-            { query },
-            {
-                headers: {
-                    "x-app-id": process.env.NUTRITIONIX_APP_ID,
-                    "x-app-key": process.env.NUTRITIONIX_API_KEY,
-                },
+        if (isBarcode) {
+            //  Search by barcode using Nutritionix
+            const nutritionixResponse = await axios.get(
+                `https://trackapi.nutritionix.com/v2/search/item?upc=${query}`,
+                {
+                    headers: {
+                        "x-app-id": process.env.NUTRITIONIX_APP_ID,
+                        "x-app-key": process.env.NUTRITIONIX_API_KEY,
+                    },
+                }
+            );
+            
+            if (nutritionixResponse.data.foods.length > 0) {
+                return res.json(formatNutritionixResponse(nutritionixResponse.data.foods));
             }
-        );
-
-        if (nutritionixResponse.data.foods.length > 0) {
-            return res.json(formatNutritionixResponse(nutritionixResponse.data.foods));
+        } else {
+            //  Search by food name using Nutritionix
+            const nutritionixResponse = await axios.post(
+                "https://trackapi.nutritionix.com/v2/natural/nutrients",
+                { query },
+                {
+                    headers: {
+                        "x-app-id": process.env.NUTRITIONIX_APP_ID,
+                        "x-app-key": process.env.NUTRITIONIX_API_KEY,
+                    },
+                }
+            );
+            
+            if (nutritionixResponse.data.foods.length > 0) {
+                return res.json(formatNutritionixResponse(nutritionixResponse.data.foods));
+            }
         }
 
-        // ❌ If Not Found in Nutritionix, Try USDA API
+        //  If Not Found in Nutritionix, Try USDA API as fallback
         const usdaResponse = await axios.get(
             `https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&api_key=${process.env.USDA_API_KEY}`
         );
@@ -40,7 +60,7 @@ exports.searchFood = async (req, res) => {
     }
 };
 
-// ✅ Log Food Entry & Update Daily Summary
+//  Log Food Entry & Update Daily Summary
 exports.logFood = async (req, res) => {
     try {
         const { user_id, meal_type, food_name, brand_name, portion, unit, calories, protein, carbs, fats } = req.body;
@@ -69,14 +89,14 @@ exports.getLoggedFood = async (req, res) => {
     try {
         const { userId, date } = req.params;
 
-        // ✅ Fetch food entries for the user on the selected date
+        //  Fetch food entries for the user on the selected date
         const foodLogs = await Food.getFoodEntriesByDate(userId, date);
 
         if (!foodLogs.length) {
             return res.status(200).json({ message: "No food logged for this date.", data: {} });
         }
 
-        // ✅ Group food by meal type
+        //  Group food by meal type
         let groupedLogs = { breakfast: [], lunch: [], dinner: [], snack: [] };
         foodLogs.forEach((entry) => {
             groupedLogs[entry.meal_type].push(entry);
@@ -93,7 +113,7 @@ exports.getDailySummary = async (req, res) => {
     try {
         const { userId, date } = req.params;
 
-        // ✅ Fetch daily macro summary from the database
+        //  Fetch daily macro summary from the database
         const summary = await Food.getDailySummaryByDate(userId, date);
 
         if (!summary) {
@@ -134,7 +154,7 @@ exports.deleteFood = async (req, res) => {
 
 
 
-// ✅ Format Nutritionix API Response
+//  Format Nutritionix API Response
 const formatNutritionixResponse = (foods) => {
     return foods.map(food => ({
         food_name: food.food_name,
@@ -148,7 +168,7 @@ const formatNutritionixResponse = (foods) => {
     }));
 };
 
-// ✅ Format USDA API Response
+//  Format USDA API Response
 const formatUsdaResponse = (foods) => {
     return foods.map(food => ({
         food_name: food.description,
@@ -162,7 +182,7 @@ const formatUsdaResponse = (foods) => {
     }));
 };
 
-// ✅ Extract Nutrient Data from USDA API
+//  Extract Nutrient Data from USDA API
 const extractNutrient = (food, nutrientId) => {
     const nutrient = food.foodNutrients.find(n => n.nutrientId === nutrientId);
     return nutrient ? nutrient.value : 0;
