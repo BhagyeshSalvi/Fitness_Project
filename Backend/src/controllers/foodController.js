@@ -3,62 +3,98 @@ require("dotenv").config();
 const Food = require("../models/Food");
 
 // ✅ Search Food in Nutritionix & USDA
+// ✅ Search Food in Nutritionix & USDA
 exports.searchFood = async (req, res) => {
     try {
         const { query } = req.params;
-        
-        // Check if query is a barcode (numeric value)
+
+        // Check if the query is a barcode (numeric value)
         const isBarcode = /^[0-9]+$/.test(query);
 
+        let foodData = [];
+
         if (isBarcode) {
-            //  Search by barcode using Nutritionix
-            const nutritionixResponse = await axios.get(
-                `https://trackapi.nutritionix.com/v2/search/item?upc=${query}`,
-                {
-                    headers: {
-                        "x-app-id": process.env.NUTRITIONIX_APP_ID,
-                        "x-app-key": process.env.NUTRITIONIX_API_KEY,
-                    },
+            try {
+                // 🔹 Search by barcode using Nutritionix
+                const nutritionixResponse = await axios.get(
+                    `https://trackapi.nutritionix.com/v2/search/item?upc=${query}`,
+                    {
+                        headers: {
+                            "x-app-id": process.env.NUTRITIONIX_APP_ID,
+                            "x-app-key": process.env.NUTRITIONIX_API_KEY,
+                        },
+                    }
+                );
+
+                if (nutritionixResponse.data.foods.length > 0) {
+                    foodData = formatNutritionixResponse(nutritionixResponse.data.foods);
                 }
-            );
-            
-            if (nutritionixResponse.data.foods.length > 0) {
-                return res.json(formatNutritionixResponse(nutritionixResponse.data.foods));
+            } catch (error) {
+                if (error.response?.status === 404) {
+                    console.log(`🔍 Barcode not found: ${query}`);
+                } else {
+                    console.error("❌ Nutritionix API Error:", error.message);
+                }
             }
         } else {
-            //  Search by food name using Nutritionix
-            const nutritionixResponse = await axios.post(
-                "https://trackapi.nutritionix.com/v2/natural/nutrients",
-                { query },
-                {
-                    headers: {
-                        "x-app-id": process.env.NUTRITIONIX_APP_ID,
-                        "x-app-key": process.env.NUTRITIONIX_API_KEY,
-                    },
+            try {
+                // 🔹 Search by food name using Nutritionix
+                const nutritionixResponse = await axios.post(
+                    "https://trackapi.nutritionix.com/v2/natural/nutrients",
+                    { query },
+                    {
+                        headers: {
+                            "x-app-id": process.env.NUTRITIONIX_APP_ID,
+                            "x-app-key": process.env.NUTRITIONIX_API_KEY,
+                        },
+                    }
+                );
+
+                if (nutritionixResponse.data.foods.length > 0) {
+                    foodData = formatNutritionixResponse(nutritionixResponse.data.foods);
                 }
-            );
-            
-            if (nutritionixResponse.data.foods.length > 0) {
-                return res.json(formatNutritionixResponse(nutritionixResponse.data.foods));
+            } catch (error) {
+                if (error.response?.status === 404) {
+                    console.log(`🔍 Food name not found: ${query}`);
+                } else {
+                    console.error("❌ Nutritionix API Error:", error.message);
+                }
             }
         }
 
-        //  If Not Found in Nutritionix, Try USDA API as fallback
-        const usdaResponse = await axios.get(
-            `https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&api_key=${process.env.USDA_API_KEY}`
-        );
+        // If not found in Nutritionix, try USDA API as a fallback
+        if (foodData.length === 0) {
+            try {
+                const usdaResponse = await axios.get(
+                    `https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&api_key=${process.env.USDA_API_KEY}`
+                );
 
-        if (usdaResponse.data.foods.length > 0) {
-            return res.json(formatUsdaResponse(usdaResponse.data.foods));
+                if (usdaResponse.data.foods.length > 0) {
+                    foodData = formatUsdaResponse(usdaResponse.data.foods);
+                }
+            } catch (error) {
+                if (error.response?.status === 404) {
+                    console.log(`🔍 Not found in USDA: ${query}`);
+                } else {
+                    console.error("❌ USDA API Error:", error.message);
+                }
+            }
         }
 
-        res.status(404).json({ error: "Food not found in any database" });
+        // ✅ If no data found in both databases
+        if (foodData.length === 0) {
+            return res.status(404).json({ error: "Food not found" });
+        }
+
+        // ✅ Return the food data
+        res.json(foodData);
 
     } catch (error) {
-        console.error("❌ Error searching food:", error);
+        console.error("❌ Unexpected Server Error:", error.message);
         res.status(500).json({ error: "Internal server error" });
     }
 };
+
 
 //  Log Food Entry & Update Daily Summary
 exports.logFood = async (req, res) => {

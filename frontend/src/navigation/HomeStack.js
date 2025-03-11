@@ -18,7 +18,7 @@ const HomeStackNavigator = () => {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="FoodLogScreen" component={FoodLogScreen} />
       <Stack.Screen name="FoodSearchScreen" component={FoodSearchScreen} />
-      <Stack.Screen name="FoodDetailScreen" component={FoodDetailScreen} />
+      <Stack.Screen name="FoodDetailsScreen" component={FoodDetailScreen} />
     </Stack.Navigator>
   );
 };
