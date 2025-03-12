@@ -1,5 +1,5 @@
 # Node.js-related files
-node_modules/         # Dependencies folder
+node_modules/      # Dependencies folder
 npm-debug.log         # Debug logs
 yarn.lock             # Yarn lock file (if using Yarn)
 
