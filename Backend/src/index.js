@@ -8,7 +8,7 @@ const foodRoutes = require('./routes/foodRoutes')
 const app = express();
 
 // Middleware
-app.use(cors({ origin: '*' })); 
+app.use(cors());
 app.use(express.json());
 
 app.use((req, res, next) => {
