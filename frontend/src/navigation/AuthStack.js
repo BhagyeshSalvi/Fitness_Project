@@ -11,7 +11,7 @@ const Stack = createStackNavigator();
 
 const AuthStack = ({ setIsAuthenticated }) => {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator screenOptions={{ headerShown: false, animation: 'fade' }}>
       <Stack.Screen name="Login">
         {(props) => <LoginScreen {...props} setIsAuthenticated={setIsAuthenticated} />}
       </Stack.Screen>
