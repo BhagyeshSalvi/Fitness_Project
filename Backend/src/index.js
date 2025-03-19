@@ -5,6 +5,7 @@ const authRoutes = require('./routes/authRoutes');
 const nutritionRoutes = require('./routes/nutritionRoutes');
 const workoutRoutes = require('./routes/workoutRoutes');
 const foodRoutes = require('./routes/foodRoutes')
+const personalDetailsRoutes = require('./routes/personalDetailsRoutes')
 const app = express();
 
 // Middleware
@@ -23,6 +24,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/nutrition', nutritionRoutes);
 app.use('/api/workout',workoutRoutes);
 app.use('/api/food', foodRoutes)
+app.use('/api/personalDetails', personalDetailsRoutes)
+
 
 // Start the server
 const PORT = process.env.PORT || 5000;
