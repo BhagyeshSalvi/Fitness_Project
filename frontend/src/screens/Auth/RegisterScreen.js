@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Image, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import * as Animatable from 'react-native-animatable';
 import axios from 'axios';
 import { API_URL } from '@env';
@@ -64,8 +65,15 @@ const RegisterScreen = ({ navigation }) => {
     }
   };
 
+
   return (
-    <View style={styles.container}>
+
+    <KeyboardAwareScrollView
+      contentContainerStyle={styles.container}
+      enableOnAndroid={true}
+      extraScrollHeight={20}
+      keyboardShouldPersistTaps="handled"
+    >
       <Image source={require('../../assets/bg.png')} style={styles.logo} resizeMode="cover" />
       <Text style={styles.title}>Register</Text>
 
@@ -114,8 +122,11 @@ const RegisterScreen = ({ navigation }) => {
           <Text style={styles.linkText}>Already have an account? Login</Text>
         </TouchableOpacity>
       </Animatable.View>
-    </View>
+    </KeyboardAwareScrollView>
+
   );
+
+
 };
 
 const styles = StyleSheet.create({
@@ -137,7 +148,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FFFFFF',
     marginBottom: 20,
-    fontFamily:'Ponomar-Regular',
+    fontFamily: 'Ponomar-Regular',
   },
   formContainer: {
     width: '100%',
