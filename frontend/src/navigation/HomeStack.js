@@ -7,10 +7,12 @@ import SettingsScreen from "../screens/Home/SettingsScreen";
 import FoodLogScreen from "../screens/Home/FoodLogScreen";
 import FoodSearchScreen from "../screens/Home/FoodSearchScreen";
 import FoodDetailScreen from "../screens/Home/FoodDetailsScreen";
+import LogActivityScreen from "../screens/Home/LogActivityScreen";
 import { Ionicons } from "@expo/vector-icons";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
+
 
 // Stack Navigator for Home, including Food Screens
 const HomeStackNavigator = () => {
@@ -19,6 +21,16 @@ const HomeStackNavigator = () => {
       <Stack.Screen name="FoodLogScreen" component={FoodLogScreen} />
       <Stack.Screen name="FoodSearchScreen" component={FoodSearchScreen} />
       <Stack.Screen name="FoodDetailsScreen" component={FoodDetailScreen} />
+    </Stack.Navigator>
+  );
+};
+
+// Stack Navigator for Workout
+const WorkoutStackNavigator = () => {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="WorkoutScreen" component={WorkoutScreen} />
+      <Stack.Screen name="LogActivityScreen" component={LogActivityScreen} />
     </Stack.Navigator>
   );
 };
@@ -41,7 +53,7 @@ const HomeStack = ({ setIsAuthenticated }) => {
     >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Food Log" component={HomeStackNavigator} /> 
-      <Tab.Screen name="Workout" component={WorkoutScreen} />
+      <Tab.Screen name="Workout" component={WorkoutStackNavigator} />
       <Tab.Screen name="Settings">
         {(props) => <SettingsScreen {...props} setIsAuthenticated={setIsAuthenticated} />}
       </Tab.Screen>

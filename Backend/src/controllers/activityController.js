@@ -66,3 +66,25 @@ exports.logActivity = async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 };
+
+// NEW: Fetch activity history for a specific date
+exports.getActivityHistory = async (req, res) => {
+    try {
+        const { user_id, date } = req.query;
+
+        if (!user_id || !date) {
+            return res.status(400).json({ error: "User ID and Date are required." });
+        }
+
+        const activities = await Activity.getActivityHistory(user_id, date);
+
+        res.status(200).json({
+            message: "Activity history fetched successfully.",
+            activities
+        });
+
+    } catch (err) {
+        console.error("❌ Error fetching activity history:", err);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
