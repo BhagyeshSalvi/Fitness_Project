@@ -88,11 +88,13 @@ const WorkoutScreen = ({ navigation }) => {
        {/* ✅ Activity History Table */}
        <View style={styles.activityTableContainer}>
         <Text style={styles.tableHeader}>Today's Activity Log</Text>
+        
 
         {activityHistory.length === 0 ? (
           <Text style={styles.noActivity}>No activity logged today.</Text>
         ) : (
           <View>
+            <View style={styles.divider} />
             <View style={styles.tableRow}>
               <Text style={styles.tableColHeader}>Activity</Text>
               <Text style={styles.tableColHeader}>Intensity</Text>
@@ -120,21 +122,113 @@ const WorkoutScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flexGrow: 1, padding: 20, backgroundColor: '#fff' },
-  title: { fontSize: 28, fontWeight: 'bold', marginBottom: 20 },
-  workoutType: { fontSize: 22, fontWeight: 'bold', marginBottom: 10 },
-  exerciseText: { fontSize: 18, marginBottom: 5 },
-  restText: { fontSize: 20, fontStyle: 'italic', color: 'gray' },
+  container: { flexGrow: 1, padding: 20, backgroundColor: '#141414' },
 
-  logButton: { backgroundColor: '#008080', padding: 15, borderRadius: 8, alignItems: 'center', marginTop: 20 },
-  logButtonText: { color: '#fff', fontSize: 16 },
+  title: { 
+    fontSize: 40, 
+    fontWeight: 'bold', 
+    marginBottom: 20, 
+    color: "#008080", 
+    fontFamily: 'Ponomar-Regular' 
+  },
 
-  activityTableContainer: { marginTop: 30, backgroundColor: '#f1f1f1', padding: 15, borderRadius: 10 },
-  tableHeader: { fontSize: 18, fontWeight: 'bold', marginBottom: 10 },
-  tableRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 },
-  tableColHeader: { flex: 1, fontWeight: 'bold', textAlign: 'center' },
-  tableCol: { flex: 1, textAlign: 'center' },
-  noActivity: { textAlign: 'center', color: 'gray' },
+  workoutType: { 
+    fontSize: 22, 
+    fontWeight: 'bold', 
+    marginBottom: 10, 
+    color: '#FFFFFF',
+    fontFamily: 'Ponomar-Regular' 
+  },
+
+  exerciseText: { 
+    fontSize: 20, 
+    marginBottom: 8, 
+    color: "#FFFFFF", 
+    fontFamily: 'Ponomar-Regular' 
+  },  
+
+  restText: { 
+    fontSize: 20, 
+    fontStyle: 'italic', 
+    color: '#AAAAAA', 
+    fontFamily: 'Ponomar-Regular' 
+  },
+
+  logButton: { 
+    backgroundColor: '#008080', 
+    padding: 13, 
+    borderRadius: 16, 
+    alignItems: 'center', 
+    marginTop: 30 
+  },
+
+  logButtonText: { 
+    color: '#FFFFFF', 
+    fontSize: 20, 
+    fontWeight: 'bold', 
+    fontFamily: 'Ponomar-Regular' 
+  },
+
+
+  activityTableContainer: { 
+    marginTop: 30, 
+    backgroundColor: '#1e1e1e', 
+    padding: 16, 
+    borderRadius: 16 
+  },
+
+  tableHeader: { 
+    flex:1,
+    textAlign: 'center',
+    fontSize: 24, 
+    fontWeight: 'bold', 
+    marginBottom: 10, 
+    color: '#FFFFFF', 
+    fontFamily: 'Ponomar-Regular' 
+  },
+
+  tableRow: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    marginBottom: 12 
+  },
+
+  tableColHeader: { 
+    flex: 1, 
+    fontWeight: 'bold', 
+    textAlign: 'center', 
+    color: '#008080', 
+    fontFamily: 'Ponomar-Regular', 
+    fontSize: 20, 
+    
+  },
+
+  tableCol: { 
+    flex: 1, 
+    textAlign: 'center',
+    fontSize: 16,  
+    color: '#FFFFFF', 
+    fontFamily: 'Ponomar-Regular' 
+  },
+
+  noActivity: { 
+    textAlign: 'center', 
+    color: '#AAAAAA', 
+    fontStyle: 'italic', 
+    fontFamily: 'Ponomar-Regular' 
+  },
+
+  caloriesBurned: {
+    color: '#FFA726', 
+    fontWeight: 'bold'
+  },
+
+  divider: {
+    height: 1,
+    backgroundColor: '#333333', // Slight gray line
+    marginVertical:2,
+  }
+  
 });
 
 export default WorkoutScreen;
