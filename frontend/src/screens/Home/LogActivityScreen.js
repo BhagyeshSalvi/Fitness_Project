@@ -49,8 +49,8 @@ const LogActivityScreen = ({ navigation }) => {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      Alert.alert('Success', 'Activity logged successfully!');
-      navigation.goBack(); // ✅ Navigate back to WorkoutScreen
+      Alert.alert('✅ Success', 'Activity logged successfully!');
+      navigation.goBack();
     } catch (error) {
       console.error('❌ Error logging activity:', error);
       Alert.alert('Error', 'Failed to log activity.');
@@ -71,8 +71,9 @@ const LogActivityScreen = ({ navigation }) => {
           setItems={setActivityItems}
           placeholder="Select Activity"
           style={styles.dropdown}
-          dropDownContainerStyle={{ borderColor: '#ccc' }}
+          dropDownContainerStyle={styles.dropDownContainer}
           listMode="SCROLLVIEW"
+          textStyle={{ color: '#fff', fontFamily: 'Ponomar-Regular',fontSize:18 }}
         />
       </View>
 
@@ -82,6 +83,7 @@ const LogActivityScreen = ({ navigation }) => {
         keyboardType="numeric"
         value={duration}
         onChangeText={setDuration}
+        placeholderTextColor="#888"
       />
 
       <View style={{ zIndex: 2000 }}>
@@ -94,25 +96,52 @@ const LogActivityScreen = ({ navigation }) => {
           setItems={setIntensityItems}
           placeholder="Select Intensity"
           style={styles.dropdown}
-          dropDownContainerStyle={{ borderColor: '#ccc' }}
+          dropDownContainerStyle={styles.dropDownContainer}
           listMode="SCROLLVIEW"
+          textStyle={{ color: '#fff', fontFamily: 'Ponomar-Regular',fontSize:18 }}
         />
       </View>
 
       <TouchableOpacity style={styles.logButton} onPress={handleLogActivity}>
-        <Text style={styles.logButtonText}>Log Activity</Text>
+        <Text style={styles.logButtonText}>+ Log Activity</Text>
       </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#fff' },
-  title: { fontSize: 28, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
-  dropdown: { borderColor: '#ccc', marginBottom: 15, zIndex: 5000 },
-  input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 10, marginBottom: 15 },
-  logButton: { backgroundColor: '#008080', padding: 15, borderRadius: 8, alignItems: 'center' },
-  logButtonText: { color: '#fff', fontSize: 16 },
+  container: { flex: 1, padding: 20, backgroundColor: '#141414', paddingTop: 60 },
+  title: { fontSize: 30, color: '#008080', fontWeight: 'bold', marginBottom: 20, textAlign: 'center', fontFamily: 'Ponomar-Regular' },
+  
+  dropdown: {
+    backgroundColor: '#1e1e1e',
+    borderColor: '#333',
+    marginBottom: 15,
+    zIndex: 5000,
+  },
+  dropDownContainer: {
+    backgroundColor: '#1e1e1e',
+    borderColor: '#333'
+  },
+  input: {
+    backgroundColor: '#1e1e1e',
+    borderColor: '#333',
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 15,
+    color: '#fff',
+    fontFamily: 'Ponomar-Regular',
+    fontSize: 18,
+  },
+  logButton: {
+    backgroundColor: '#008080',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 20
+  },
+  logButtonText: { color: '#fff', fontSize: 20, fontFamily: 'Ponomar-Regular' },
 });
 
 export default LogActivityScreen;

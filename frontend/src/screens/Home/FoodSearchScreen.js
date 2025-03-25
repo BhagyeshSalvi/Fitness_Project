@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { View, Text, TextInput, Button, FlatList, TouchableOpacity, StyleSheet } from "react-native";
 import axios from "axios";
 import { API_URL } from "@env";
@@ -55,21 +55,21 @@ const FoodSearchScreen = () => {
 
   const handleBarcodeScan = ({ data }) => {
     if (hasScannedRef.current) return;
-  
+
     console.log(`📸 Scanned Barcode: ${data}`);
-    hasScannedRef.current = true; 
+    hasScannedRef.current = true;
     setScanning(false); // ✅ Close scanner immediately
-  
+
     setSearchQuery(data);
     searchByBarcode(data);
-  
+
     //  Reset scanning lock after 3 seconds
     setTimeout(() => {
       console.log("🔄 Resetting scanner...");
-      hasScannedRef.current = false; ;
+      hasScannedRef.current = false;;
     }, 3000);
   };
-  
+
 
   const openScanner = () => {
     if (!permission?.granted) {
@@ -77,7 +77,7 @@ const FoodSearchScreen = () => {
       requestPermission();
       return;
     }
-    
+
     setScanning(true);
   };
 
@@ -88,11 +88,17 @@ const FoodSearchScreen = () => {
           <TextInput
             style={styles.input}
             placeholder="Search food or enter barcode"
+            placeholderTextColor="#CCCCCC"
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
-          <Button title="Search" onPress={searchFood} />
-          <Button title="Scan Barcode" onPress={openScanner} />
+          <TouchableOpacity style={styles.searchButton} onPress={searchFood}>
+            <Text style={styles.buttonText}>Search</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.scanButton} onPress={openScanner}>
+            <Text style={styles.buttonText}>Scan Barcode</Text>
+          </TouchableOpacity>
 
           <FlatList
             data={results}
@@ -103,7 +109,12 @@ const FoodSearchScreen = () => {
                 onPress={() => navigation.navigate("FoodDetailsScreen", { food: item, mealType })}
               >
                 <Text style={styles.foodName}>{item.food_name} ({item.brand_name})</Text>
-                <Text>{item.calories} kcal</Text>
+                <View style={styles.macroRow}>
+                  <Text style={styles.proteinText}>P {Number(item.protein).toFixed(1)}g</Text>
+                  <Text style={styles.carbText}>C {Number(item.carbs).toFixed(1)}g</Text>
+                  <Text style={styles.fatText}>F {Number(item.fats).toFixed(1)}g</Text>
+                  <Text style={styles.calorieText}>🔥 {Number(item.calories).toFixed(1)}</Text>
+                </View>
               </TouchableOpacity>
             )}
           />
@@ -115,7 +126,9 @@ const FoodSearchScreen = () => {
             facing="back"
             onBarcodeScanned={hasScannedRef.current ? undefined : handleBarcodeScan} // Prevents multiple scans
           />
-          <Button title="Close Scanner" onPress={() => setScanning(false)} />
+          <TouchableOpacity style={styles.closeButton} onPress={() => setScanning(false)}>
+            <Text style={styles.buttonText}>Close Scanner</Text>
+          </TouchableOpacity>
         </View>
       )}
     </View>
@@ -123,12 +136,91 @@ const FoodSearchScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  input: { borderWidth: 1, padding: 10, borderRadius: 8, marginBottom: 10 },
-  resultItem: { padding: 15, borderBottomWidth: 1 },
-  foodName: { fontSize: 16, fontWeight: "bold" },
-  cameraContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
-  camera: { width: "100%", height: "80%" },
+
+  macroRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 },
+
+  proteinText: { color: '#FF4081', fontSize: 14 },   // Pink
+  carbText: { color: '#42A5F5', fontSize: 14 },      // Blue
+  fatText: { color: '#66BB6A', fontSize: 14 },       // Green
+  calorieText: { color: '#FFA726', fontSize: 14 },   // Orange
+  container: {
+    flex: 1,
+    backgroundColor: '#141414',
+    padding: 20,
+    paddingTop: 60,
+  },
+
+  input: {
+    borderWidth: 1,
+    borderColor: '#008080',
+    backgroundColor: '#1e1e1e',
+    color: '#FFFFFF',
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 15,
+    fontFamily: 'Ponomar-Regular',
+    fontSize: 16,
+  },
+  searchButton: {
+    backgroundColor: '#008080',
+    paddingVertical: 14,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  scanButton: {
+    backgroundColor: '#008080',
+    paddingVertical: 14,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontFamily: 'Ponomar-Regular',
+  },
+  resultItem: {
+    backgroundColor: '#1e1e1e',
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+  },
+  foodName: {
+    fontSize: 18,
+    color: '#FFFFFF',
+    fontFamily: 'Ponomar-Regular',
+    marginBottom: 6,
+  },
+  calories: {
+    color: '#CCCCCC',
+    fontSize: 14,
+    fontFamily: 'Ponomar-Regular',
+  },
+  cameraContainer: {
+    flex: 1,
+    backgroundColor: '#141414',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  camera: {
+    width: '100%',
+    height: '80%',
+    borderRadius: 15,
+    overflow: 'hidden',
+  },
+  closeButton: {
+    backgroundColor: '#008080',
+    padding: 14,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 20,
+    width: '60%',
+  },
 });
+
 
 export default FoodSearchScreen;

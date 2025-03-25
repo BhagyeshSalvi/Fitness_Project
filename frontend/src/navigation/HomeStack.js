@@ -40,6 +40,16 @@ const HomeStack = ({ setIsAuthenticated }) => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarStyle: {
+          backgroundColor: '#141414',  // Dark background
+          borderTopWidth: 0,
+        },
+        tabBarActiveTintColor: '#008080',   // Teal active icon
+        tabBarInactiveTintColor: '#AAAAAA', // Gray inactive icon
+         headerStyle: { backgroundColor: '#141414' },
+        headerTintColor: '#FFFFFF',
+        headerTitleStyle: { fontFamily: 'Ponomar-Regular', fontSize: 20 },
         tabBarIcon: ({ color, size }) => {
           let iconName;
           if (route.name === "Home") iconName = "home";

@@ -7,6 +7,7 @@ import { API_URL } from "@env";
 import * as Progress from "react-native-progress";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 
+
 const FoodLogScreen = () => {
   const navigation = useNavigation();
   const [userId, setUserId] = useState(null);
@@ -151,9 +152,9 @@ const FoodLogScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#141414", padding: 20 },
+  container: { flex: 1, backgroundColor: "#141414", padding: 20, paddingTop:50 },
   loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#141414" },
-  headerTitle: { fontSize: 26, fontWeight: "bold", color: "#008080", textAlign: "center", marginBottom: 20, fontFamily: 'Ponomar-Regular' },
+  headerTitle: { fontSize: 30, fontWeight: "bold", color: "#008080", textAlign: "center", marginBottom: 10, fontFamily: 'Ponomar-Regular' },
   progressContainer: { flexDirection: "row", justifyContent: "space-around", flexWrap: "wrap" },
   progressItem: { alignItems: "center", margin: 10 },
   macroLabel: { fontSize: 18, color: "#FFFFFF", fontWeight: "bold", marginTop: 3, fontFamily: 'Ponomar-Regular' },

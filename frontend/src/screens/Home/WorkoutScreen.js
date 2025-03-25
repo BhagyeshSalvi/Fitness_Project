@@ -122,7 +122,7 @@ const WorkoutScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flexGrow: 1, padding: 20, backgroundColor: '#141414' },
+  container: { flexGrow: 1, padding: 20, backgroundColor: '#141414', paddingTop:50  },
 
   title: { 
     fontSize: 40, 
