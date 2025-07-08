@@ -71,5 +71,20 @@ exports.login = async (req, res) => {
     }
 };
 
+exports.getUserInfoById = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const result = await User.findById(userId);
+        if (!result || result.length === 0) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        res.status(200).json(result[0]);
+    } catch (error) {
+        console.error("❌ Error fetching user info:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+
 
 

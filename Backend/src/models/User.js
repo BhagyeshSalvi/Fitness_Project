@@ -29,6 +29,17 @@ const User = {
             });
         });
     },
+
+    findById: (id) => {
+    return new Promise((resolve, reject) => {
+        const query = 'SELECT id, email, firstname, lastname FROM users WHERE id = ?';
+        connection.query(query, [id], (err, results) => {
+            if (err) reject(err);
+            else resolve(results);
+        });
+    });
+}
+
 };
 
 module.exports = User;
