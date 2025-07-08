@@ -1,166 +1,261 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import DropDownPicker from 'react-native-dropdown-picker';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { jwtDecode } from 'jwt-decode';
 import { API_URL } from '@env';
 
 const PersonalDetailsScreen = ({ navigation }) => {
-    const [gender, setGender] = useState('');
-    const [weight, setWeight] = useState('');
-    const [height, setHeight] = useState('');
-    const [age, setAge] = useState('');
-    const [activityLevel, setActivityLevel] = useState('');
-    const [goal, setGoal] = useState('');
+  const [weight, setWeight] = useState('');
+  const [height, setHeight] = useState('');
+  const [age, setAge] = useState('');
 
-    const handleNext = async () => {
-        // Check if all fields are filled
-        if (!gender || !weight || !height || !age || !activityLevel || !goal) {
-            alert('Please fill all fields.');
-            return;
-        }
+  const [genderOpen, setGenderOpen] = useState(false);
+  const [gender, setGender] = useState(null);
+  const [genderItems, setGenderItems] = useState([
+    { label: 'Male', value: 'male' },
+    { label: 'Female', value: 'female' }
+  ]);
 
-        // Validate weight
-        const weightValue = parseFloat(weight);
-        if (weightValue < 30 || weightValue > 300) {
-            alert('Please enter a valid weight between 30kg and 300kg.');
-            return;
-        }
+  const [activityOpen, setActivityOpen] = useState(false);
+  const [activityLevel, setActivityLevel] = useState(null);
+  const [activityItems, setActivityItems] = useState([
+    { label: 'Sedentary', value: 'sedentary' },
+    { label: 'Lightly Active', value: 'lightly_active' },
+    { label: 'Moderately Active', value: 'moderately_active' },
+    { label: 'Very Active', value: 'very_active' },
+    { label: 'Super Active', value: 'super_active' }
+  ]);
 
-        // Validate height (in feet for now)
-        const heightValue = parseFloat(height);
-        if (heightValue < 1.5 || heightValue > 8) {
-            alert('Please enter a valid height between 1.5 feet and 8 feet.');
-            return;
-        }
+  const [goalOpen, setGoalOpen] = useState(false);
+  const [goal, setGoal] = useState(null);
+  const [goalItems, setGoalItems] = useState([
+    { label: 'Maintain', value: 'maintain' },
+    { label: 'Weight Loss', value: 'weight_loss' },
+    { label: 'Weight Gain', value: 'weight_gain' }
+  ]);
 
-        // Validate age
-        const ageValue = parseInt(age, 10);
-        if (ageValue < 16 || ageValue > 80) {
-            alert('Please enter a valid age between 16 and 80.');
-            return;
-        }
+  const handleNext = async () => {
+    if (!gender || !weight || !height || !age || !activityLevel || !goal) {
+      Alert.alert('Error', 'Please fill all fields.');
+      return;
+    }
 
-        try {
-            // ✅ Get JWT token and decode user_id
-            const token = await SecureStore.getItemAsync('userToken');
-            const decodedToken = jwtDecode(token);
-            const userId = decodedToken.userID;
+    const weightValue = parseFloat(weight);
+    const heightValue = parseFloat(height);
+    const ageValue = parseInt(age, 10);
 
-            // ✅ Call API to save personal details
-            await axios.post(`${API_URL}/api/personalDetails/save`, {
-                user_id: userId,
-                gender,
-                weight: weightValue,
-                height: heightValue,
-                age: ageValue,
-                activity_level: activityLevel,
-                goal
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
+    if (weightValue < 30 || weightValue > 300) {
+      alert('Weight must be between 30kg and 300kg.');
+      return;
+    }
 
-            // ✅ Navigate to Nutrition Recommendation after saving
-            navigation.navigate('NutritionRecommendation', {
-                gender,
-                weight: weightValue,
-                height: heightValue,
-                age: ageValue,
-                activityLevel,
-                goal,
-            });
-        } catch (error) {
-            console.error('❌ Error saving personal details:', error);
-            Alert.alert('Error', 'Failed to save personal details. Please try again.');
-        }
-    };
+    if (heightValue < 1.5 || heightValue > 8) {
+      alert('Height must be between 1.5ft and 8ft.');
+      return;
+    }
 
-    return (
-        <ScrollView contentContainerStyle={styles.container}>
-            <Text style={styles.title}>Tell Us About Yourself</Text>
+    if (ageValue < 16 || ageValue > 80) {
+      alert('Age must be between 16 and 80.');
+      return;
+    }
 
-            <Text style={styles.label}>Gender</Text>
-            <Picker
-                selectedValue={gender}
-                onValueChange={(itemValue) => setGender(itemValue)}
-                style={styles.picker}
-            >
-                <Picker.Item label="Select Gender" value="" />
-                <Picker.Item label="Male" value="male" />
-                <Picker.Item label="Female" value="female" />
-            </Picker>
+    try {
+      const token = await SecureStore.getItemAsync('userToken');
+      const decodedToken = jwtDecode(token);
+      const userId = decodedToken.userID;
 
-            <Text style={styles.label}>Weight (kg)</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Enter your weight"
-                keyboardType="numeric"
-                value={weight}
-                onChangeText={setWeight}
-            />
+      await axios.post(`${API_URL}/api/personalDetails/save`, {
+        user_id: userId,
+        gender,
+        weight: weightValue,
+        height: heightValue,
+        age: ageValue,
+        activity_level: activityLevel,
+        goal
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
 
-            <Text style={styles.label}>Height (feet)</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Enter your height"
-                keyboardType="numeric"
-                value={height}
-                onChangeText={setHeight}
-            />
+      navigation.navigate('NutritionRecommendation', {
+        gender, weight: weightValue, height: heightValue,
+        age: ageValue, activityLevel, goal
+      });
+    } catch (error) {
+      console.error('Error saving personal details:', error);
+      Alert.alert('Error', 'Something went wrong. Please try again.');
+    }
+  };
 
-            <Text style={styles.label}>Age</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Enter your age"
-                keyboardType="numeric"
-                value={age}
-                onChangeText={setAge}
-            />
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Tell Us About Yourself</Text>
 
-            <Text style={styles.label}>Activity Level</Text>
-            <Picker
-                selectedValue={activityLevel}
-                onValueChange={(itemValue) => setActivityLevel(itemValue)}
-                style={styles.picker}
-            >
-                <Picker.Item label="Select Activity Level" value="" />
-                <Picker.Item label="Sedentary" value="sedentary" />
-                <Picker.Item label="Lightly Active" value="lightly_active" />
-                <Picker.Item label="Moderately Active" value="moderately_active" />
-                <Picker.Item label="Very Active" value="very_active" />
-                <Picker.Item label="Super Active" value="super_active" />
-            </Picker>
+      <View style={{ zIndex: 3000 }}>
+        <Text style={styles.label}>Gender</Text>
+        <DropDownPicker
+          open={genderOpen}
+          value={gender}
+          items={genderItems}
+          setOpen={setGenderOpen}
+          setValue={setGender}
+          setItems={setGenderItems}
+          placeholder="Select Gender"
+          listMode="SCROLLVIEW"
+          style={styles.dropdown}
+          dropDownContainerStyle={styles.dropDownContainer}
+          textStyle={styles.dropdownText}
+          listItemLabelStyle={styles.dropdownItemText}
+          selectedItemLabelStyle={styles.dropdownSelectedText}
+          placeholderStyle={styles.placeholderText}
+          onOpen={() => {
+            setActivityOpen(false);
+            setGoalOpen(false);
+          }}
+        />
+      </View>
 
-            <Text style={styles.label}>Goal</Text>
-            <Picker
-                selectedValue={goal}
-                onValueChange={(itemValue) => setGoal(itemValue)}
-                style={styles.picker}
-            >
-                <Picker.Item label="Select Goal" value="" />
-                <Picker.Item label="Maintain" value="maintain" />
-                <Picker.Item label="Weight Loss" value="weight_loss" />
-                <Picker.Item label="Weight Gain" value="weight_gain" />
-            </Picker>
+      <Text style={styles.label}>Weight (kg)</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Enter your weight"
+        placeholderTextColor="#aaa"
+        keyboardType="numeric"
+        value={weight}
+        onChangeText={setWeight}
+      />
 
-            <TouchableOpacity style={styles.button} onPress={handleNext}>
-                <Text style={styles.buttonText}>Next</Text>
-            </TouchableOpacity>
-        </ScrollView>
-    );
+      <Text style={styles.label}>Height (feet)</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Enter your height"
+        placeholderTextColor="#aaa"
+        keyboardType="numeric"
+        value={height}
+        onChangeText={setHeight}
+      />
+
+      <Text style={styles.label}>Age</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Enter your age"
+        placeholderTextColor="#aaa"
+        keyboardType="numeric"
+        value={age}
+        onChangeText={setAge}
+      />
+
+      <View style={{ zIndex: 2000 }}>
+        <Text style={styles.label}>Activity Level</Text>
+        <DropDownPicker
+          open={activityOpen}
+          value={activityLevel}
+          items={activityItems}
+          setOpen={setActivityOpen}
+          setValue={setActivityLevel}
+          setItems={setActivityItems}
+          placeholder="Select Activity Level"
+          listMode="SCROLLVIEW"
+          style={styles.dropdown}
+          dropDownContainerStyle={styles.dropDownContainer}
+          textStyle={styles.dropdownText}
+          listItemLabelStyle={styles.dropdownItemText}
+          selectedItemLabelStyle={styles.dropdownSelectedText}
+          placeholderStyle={styles.placeholderText}
+          onOpen={() => {
+            setGenderOpen(false);
+            setGoalOpen(false);
+          }}
+        />
+      </View>
+
+      <View style={{ zIndex: 1000 }}>
+        <Text style={styles.label}>Goal</Text>
+        <DropDownPicker
+          open={goalOpen}
+          value={goal}
+          items={goalItems}
+          setOpen={setGoalOpen}
+          setValue={setGoal}
+          setItems={setGoalItems}
+          placeholder="Select Goal"
+          listMode="SCROLLVIEW"
+          style={styles.dropdown}
+          dropDownContainerStyle={styles.dropDownContainer}
+          textStyle={styles.dropdownText}
+          listItemLabelStyle={styles.dropdownItemText}
+          selectedItemLabelStyle={styles.dropdownSelectedText}
+          placeholderStyle={styles.placeholderText}
+          onOpen={() => {
+            setGenderOpen(false);
+            setActivityOpen(false);
+          }}
+        />
+      </View>
+
+      <TouchableOpacity style={styles.button} onPress={handleNext}>
+        <Text style={styles.buttonText}>Next</Text>
+      </TouchableOpacity>
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
-    container: { flexGrow: 1, padding: 20, backgroundColor: '#fff' },
-    title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
-    label: { fontSize: 16, marginBottom: 10 },
-    input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 10, marginBottom: 20 },
-    picker: { borderWidth: 1, borderColor: '#ccc', borderRadius: 8, marginBottom: 20 },
-    button: { backgroundColor: '#007BFF', padding: 15, borderRadius: 8, alignItems: 'center' },
-    buttonText: { color: '#fff', fontSize: 16 },
+  container: { flex: 1, padding: 20, backgroundColor: '#141414', paddingTop: 60 },
+  title: { fontSize: 26, color: '#FFFFFF', fontWeight: 'bold', marginBottom: 24, textAlign: 'center' },
+  label: { fontSize: 16, color: '#FFFFFF', marginBottom: 6, marginTop: 10 },
+  input: {
+    backgroundColor: '#1e1e1e',
+    borderColor: '#333',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    height: 50,
+    marginBottom: 15,
+    color: '#fff',
+    fontSize: 16,
+  },
+  dropdown: {
+    backgroundColor: '#1e1e1e',
+    borderColor: '#333',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    height: 50,
+    marginBottom: 15,
+  },
+  dropDownContainer: {
+    backgroundColor: '#1e1e1e',
+    borderColor: '#333',
+  },
+  dropdownText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  dropdownItemText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  dropdownSelectedText: {
+    color: '#008080',
+    fontWeight: 'bold',
+  },
+  placeholderText: {
+    color: '#aaa',
+    fontSize: 16,
+  },
+  button: {
+    backgroundColor: '#008080',
+    padding: 14,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
 });
 
 export default PersonalDetailsScreen;

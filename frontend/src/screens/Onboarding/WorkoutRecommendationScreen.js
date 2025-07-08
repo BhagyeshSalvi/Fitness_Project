@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
+import {
+    View,
+    Text,
+    TouchableOpacity,
+    StyleSheet,
+    ScrollView,
+    Alert,
+    ActivityIndicator,
+    SafeAreaView,
+} from 'react-native';
 import axios from 'axios';
 import { API_URL } from '@env';
 import * as SecureStore from 'expo-secure-store';
@@ -50,45 +59,124 @@ const WorkoutRecommendationScreen = ({ route, navigation, setIsAuthenticated }) 
     };
 
     if (loading) {
-        return <Text style={styles.loadingText}>Loading workout recommendations...</Text>;
+        return (
+            <SafeAreaView style={styles.safeArea}>
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#008080" />
+                    <Text style={styles.loadingText}>Loading workout recommendations...</Text>
+                </View>
+            </SafeAreaView>
+        );
     }
 
     if (!workoutPlan || !workoutPlan.plan) {
-        return <Text style={styles.errorText}>No workout plan available.</Text>;
+        return (
+            <SafeAreaView style={styles.safeArea}>
+                <Text style={styles.errorText}>No workout plan available.</Text>
+            </SafeAreaView>
+        )
     }
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
-            <Text style={styles.title}>Your Workout Plan</Text>
-            <Text style={styles.splitText}>Workout Split: {workoutPlan.split}</Text>
+        <SafeAreaView style={styles.safeArea}>
+            <ScrollView contentContainerStyle={styles.container}>
+                <Text style={styles.title}>Your Workout Plan</Text>
+                <Text style={styles.splitText}>Split: {workoutPlan.split}</Text>
 
-            {Object.entries(workoutPlan.plan).map(([day, exercises]) => (
-                <View key={day} style={styles.dayContainer}>
-                    <Text style={styles.dayTitle}>{day}</Text>
-                    {exercises.map((exercise, index) => (
-                        <Text key={index} style={styles.exerciseText}>• {exercise}</Text>
-                    ))}
-                </View>
-            ))}
+                {Object.entries(workoutPlan.plan).map(([day, exercises]) => (
+                    <View key={day} style={styles.card}>
+                        <Text style={styles.dayTitle}>{day}</Text>
+                        {exercises.map((exercise, index) => (
+                            <Text key={index} style={styles.exerciseText}>• {exercise}</Text>
+                        ))}
+                    </View>
+                ))}
 
-            <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmPlan}>
-                <Text style={styles.confirmButtonText}>Confirm Plan</Text>
-            </TouchableOpacity>
-        </ScrollView>
+                <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmPlan}>
+                    <Text style={styles.confirmButtonText}>Confirm Plan</Text>
+                </TouchableOpacity>
+            </ScrollView>
+        </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
-    container: { flexGrow: 1, padding: 20, backgroundColor: '#fff', alignItems: 'center' },
-    title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
-    splitText: { fontSize: 18, fontWeight: 'bold', marginBottom: 10 },
-    dayContainer: { marginBottom: 15, alignItems: 'center' },
-    dayTitle: { fontSize: 16, fontWeight: 'bold', marginBottom: 5 },
-    exerciseText: { fontSize: 14 },
-    confirmButton: { backgroundColor: '#007BFF', padding: 15, borderRadius: 8, marginTop: 20, width: '80%', alignItems: 'center' },
-    confirmButtonText: { color: '#fff', fontSize: 16 },
-    loadingText: { fontSize: 16, textAlign: 'center', marginTop: 50 },
-    errorText: { fontSize: 16, color: 'red', textAlign: 'center' },
+    safeArea: {
+        flex: 1,
+        backgroundColor: '#141414',
+    },
+    container: {
+        flexGrow: 1,
+        backgroundColor: '#141414',
+        padding: 20,
+        alignItems: 'center',
+        marginTop: 25,
+    },
+    title: {
+        fontSize: 26,
+        fontWeight: 'bold',
+        color: '#fff',
+        marginBottom: 10,
+    },
+    splitText: {
+        fontSize: 18,
+        color: '#ccc',
+        marginBottom: 20,
+    },
+    card: {
+        backgroundColor: '#1e1e1e',
+        padding: 15,
+        borderRadius: 12,
+        marginBottom: 15,
+        width: '100%',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        elevation: 3,
+    },
+    dayTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#00b3b3',
+        marginBottom: 10,
+    },
+    exerciseText: {
+        fontSize: 15,
+        color: '#f2f2f2',
+        marginBottom: 4,
+    },
+    confirmButton: {
+        backgroundColor: '#008080',
+        paddingVertical: 15,
+        paddingHorizontal: 30,
+        borderRadius: 10,
+        marginTop: 25,
+        width: '90%',
+        alignItems: 'center',
+    },
+    confirmButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: '600',
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#141414',
+    },
+    loadingText: {
+        color: '#ccc',
+        marginTop: 15,
+        fontSize: 16,
+    },
+    errorText: {
+        color: 'red',
+        fontSize: 16,
+        textAlign: 'center',
+        marginTop: 40,
+    },
 });
 
 export default WorkoutRecommendationScreen;
