@@ -85,6 +85,44 @@ exports.getUserInfoById = async (req, res) => {
     }
 };
 
+exports.changePassword = async (req, res) => {
+  try {
+    const { userID } = req.body; // sent from decoded token
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    const users = await User.findById(userID);
+    if (!users || users.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const user = users[0];
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Current password is incorrect' });
+    }
+
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+    const sql = 'UPDATE users SET password = ? WHERE id = ?';
+
+    require('../config/db').query(sql, [hashedNewPassword, userID], (err, result) => {
+      if (err) {
+        console.error('❌ Password Update Error:', err);
+        return res.status(500).json({ error: 'Internal server error' });
+      }
+      return res.status(200).json({ message: 'Password updated successfully' });
+    });
+  } catch (error) {
+    console.error('❌ Change Password Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+
 
 
 
