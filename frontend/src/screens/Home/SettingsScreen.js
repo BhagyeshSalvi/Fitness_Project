@@ -1,52 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
+import React from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, FlatList } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
-import { jwtDecode } from 'jwt-decode'; // ✅ token decode
-import axios from 'axios';
-import { API_URL } from '@env';
+import { Ionicons } from '@expo/vector-icons';
 
-const SettingsScreen = ({ setIsAuthenticated }) => {
-  const [userInfo, setUserInfo] = useState({
-    email: '',
-    firstname: '',
-    lastname: '',
-  });
-
-  const [personalDetails, setPersonalDetails] = useState({
-    weight: '',
-    height: '',
-    age: '',
-    gender: '',
-    goal: '',
-    activity_level: '',
-  });
-
-  useEffect(() => {
-    const fetchAllInfo = async () => {
-      try {
-        const token = await SecureStore.getItemAsync('userToken');
-        if (token) {
-          const { userID } = jwtDecode(token); // ✅ decoding userID
-          
-          // User Info
-          const userRes = await axios.get(`${API_URL}/api/auth/info/${userID}`);
-          const { email, firstname, lastname } = userRes.data;
-          setUserInfo({ email, firstname, lastname });
-
-          // Personal Details
-          const detailsRes = await axios.get(`${API_URL}/api/personalDetails/get`, {
-            params: { user_id: userID },
-          });
-          setPersonalDetails(detailsRes.data);
-        }
-      } catch (error) {
-        console.error('❌ Error fetching settings data:', error);
-      }
-    };
-
-    fetchAllInfo();
-  }, []);
-
+const SettingsScreen = ({ navigation, setIsAuthenticated }) => {
   const handleLogout = async () => {
     try {
       await SecureStore.deleteItemAsync('userToken');
@@ -58,44 +15,48 @@ const SettingsScreen = ({ setIsAuthenticated }) => {
     }
   };
 
+  const settingsOptions = [
+    {
+      id: '1',
+      label: 'Profile',
+      icon: 'person-outline',
+      navigateTo: 'ProfileDetails',
+    },
+    {
+      id: '2',
+      label: 'Personal Details',
+      icon: 'body-outline',
+      navigateTo: 'PersonalDetails',
+    },
+    {
+      id: '3',
+      label: 'Change Password',
+      icon: 'key-outline',
+      navigateTo: 'ChangePassword',
+    },
+  ];
+
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.title}>⚙️ Settings</Text>
+      <Text style={styles.title}>⚙️ Settings</Text>
 
-        <View style={styles.infoCard}>
-          <Text style={styles.sectionHeader}>Account Info</Text>
-          <Text style={styles.label}>Email</Text>
-          <Text style={styles.value}>{userInfo.email}</Text>
-
-          <Text style={styles.label}>First Name</Text>
-          <Text style={styles.value}>{userInfo.firstname}</Text>
-
-          <Text style={styles.label}>Last Name</Text>
-          <Text style={styles.value}>{userInfo.lastname}</Text>
-        </View>
-
-        <View style={styles.infoCard}>
-          <Text style={styles.sectionHeader}>Personal Details</Text>
-          <Text style={styles.label}>Gender</Text>
-          <Text style={styles.value}>{personalDetails.gender}</Text>
-
-          <Text style={styles.label}>Age</Text>
-          <Text style={styles.value}>{personalDetails.age}</Text>
-
-          <Text style={styles.label}>Weight (kg)</Text>
-          <Text style={styles.value}>{personalDetails.weight}</Text>
-
-          <Text style={styles.label}>Height (cm)</Text>
-          <Text style={styles.value}>{personalDetails.height}</Text>
-
-          <Text style={styles.label}>Goal</Text>
-          <Text style={styles.value}>{personalDetails.goal}</Text>
-
-          <Text style={styles.label}>Activity Level</Text>
-          <Text style={styles.value}>{personalDetails.activity_level}</Text>
-        </View>
-      </ScrollView>
+      <FlatList
+        data={settingsOptions}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={styles.optionCard}
+            onPress={() => navigation.navigate(item.navigateTo)}
+          >
+            <View style={styles.row}>
+              <Ionicons name={item.icon} size={24} color="#008080" />
+              <Text style={styles.optionText}>{item.label}</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color="#888" />
+          </TouchableOpacity>
+        )}
+        contentContainerStyle={{ paddingBottom: 40 }}
+      />
 
       <View style={styles.bottomSection}>
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
@@ -108,60 +69,39 @@ const SettingsScreen = ({ setIsAuthenticated }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#141414',
-  },
-  scrollContent: {
-    paddingTop: 80,
-    paddingHorizontal: 20,
-    paddingBottom: 100,
-  },
+  container: { flex: 1, backgroundColor: '#141414', paddingHorizontal: 20, paddingTop: 80 },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
     color: '#FFFFFF',
     fontFamily: 'Ponomar-Regular',
-    marginBottom: 24,
+    marginBottom: 30,
     alignSelf: 'center',
   },
-  infoCard: {
+  optionCard: {
     backgroundColor: '#1f1f1f',
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.4,
-    shadowRadius: 5,
-    elevation: 6,
+    paddingVertical: 18,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    marginBottom: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    elevation: 4,
   },
-  sectionHeader: {
-    color: '#fff',
+  row: { flexDirection: 'row', alignItems: 'center' },
+  optionText: {
     fontSize: 18,
-    fontFamily: 'Ponomar-Regular',
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  label: {
-    color: '#888',
-    fontSize: 14,
-    fontFamily: 'Ponomar-Regular',
-    marginTop: 10,
-  },
-  value: {
     color: '#fff',
-    fontSize: 16,
+    marginLeft: 15,
     fontFamily: 'Ponomar-Regular',
-    marginTop: 2,
   },
   bottomSection: {
     position: 'absolute',
     bottom: 30,
-    left: 0,
-    right: 0,
+    left: 20,
+    right: 20,
     alignItems: 'center',
-    paddingHorizontal: 30,
   },
   logoutButton: {
     backgroundColor: '#008080',

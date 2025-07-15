@@ -8,6 +8,9 @@ import FoodLogScreen from "../screens/Home/FoodLogScreen";
 import FoodSearchScreen from "../screens/Home/FoodSearchScreen";
 import FoodDetailScreen from "../screens/Home/FoodDetailsScreen";
 import LogActivityScreen from "../screens/Home/LogActivityScreen";
+import ProfileDetailsScreen from '../screens/Home/ProfileDetailsScreen';
+import PersonalDetailsScreen from '../screens/Home/PersonalDetailsScreen';
+import ChangePasswordScreen from '../screens/Home/ChangePasswordScreen';
 import { Ionicons } from "@expo/vector-icons";
 
 const Tab = createBottomTabNavigator();
@@ -35,6 +38,20 @@ const WorkoutStackNavigator = () => {
   );
 };
 
+const SettingsStackNavigator = ({ setIsAuthenticated }) => {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="SettingsMain">
+        {(props) => <SettingsScreen {...props} setIsAuthenticated={setIsAuthenticated} />}
+      </Stack.Screen>
+      <Stack.Screen name="ProfileDetails" component={ProfileDetailsScreen} />
+      <Stack.Screen name="PersonalDetails" component={PersonalDetailsScreen} />
+      <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
+    </Stack.Navigator>
+  );
+};
+
+
 // ✅ Bottom Tab Navigation
 const HomeStack = ({ setIsAuthenticated }) => {
   return (
@@ -47,7 +64,7 @@ const HomeStack = ({ setIsAuthenticated }) => {
         },
         tabBarActiveTintColor: '#008080',   // Teal active icon
         tabBarInactiveTintColor: '#AAAAAA', // Gray inactive icon
-         headerStyle: { backgroundColor: '#141414' },
+        headerStyle: { backgroundColor: '#141414' },
         headerTintColor: '#FFFFFF',
         headerTitleStyle: { fontFamily: 'Ponomar-Regular', fontSize: 20 },
         tabBarIcon: ({ color, size }) => {
@@ -62,10 +79,10 @@ const HomeStack = ({ setIsAuthenticated }) => {
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Food Log" component={HomeStackNavigator} /> 
+      <Tab.Screen name="Food Log" component={HomeStackNavigator} />
       <Tab.Screen name="Workout" component={WorkoutStackNavigator} />
       <Tab.Screen name="Settings">
-        {(props) => <SettingsScreen {...props} setIsAuthenticated={setIsAuthenticated} />}
+        {(props) => <SettingsStackNavigator {...props} setIsAuthenticated={setIsAuthenticated} />}
       </Tab.Screen>
     </Tab.Navigator>
   );
