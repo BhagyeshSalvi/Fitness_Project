@@ -34,6 +34,12 @@ const SettingsScreen = ({ navigation, setIsAuthenticated }) => {
       icon: 'key-outline',
       navigateTo: 'ChangePassword',
     },
+    {
+      id: '4',
+      label: 'Food History',
+      icon: 'calendar-outline',
+      navigateTo: 'FoodHistoryScreen',
+    }
   ];
 
   return (

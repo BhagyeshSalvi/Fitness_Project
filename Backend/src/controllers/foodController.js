@@ -189,22 +189,21 @@ exports.deleteFood = async (req, res) => {
 };
 
 exports.getLoggedDates = async (req, res) => {
-    try {
-        const { userId } = req.params;
+  try {
+    const { userId } = req.params;
+    const dates = await Food.getLoggedDates(userId);
 
-        const dates = await Food.getLoggedDates(userId);
+    const markedDates = {};
+    dates.forEach(date => {
+      const formatted = new Date(date).toISOString().split('T')[0]; // 👈 strip time
+      markedDates[formatted] = { marked: true, dotColor: 'green' };
+    });
 
-        // Convert to Calendar format
-        const markedDates = {};
-        dates.forEach(date => {
-            markedDates[date] = { marked: true, dotColor: 'green' };
-        });
-
-        res.status(200).json({ markedDates });
-    } catch (error) {
-        console.error("❌ Error fetching logged dates:", error);
-        res.status(500).json({ error: "Internal server error" });
-    }
+    res.status(200).json({ markedDates });
+  } catch (error) {
+    console.error("❌ Error fetching logged dates:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 
