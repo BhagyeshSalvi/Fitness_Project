@@ -39,7 +39,14 @@ const SettingsScreen = ({ navigation, setIsAuthenticated }) => {
       label: 'Food History',
       icon: 'calendar-outline',
       navigateTo: 'FoodHistoryScreen',
-    }
+    },
+    {
+    id: '5',
+    label: 'Notification Preferences',
+    icon: 'notifications-outline',
+    navigateTo: 'NotificationSettings',
+  },
+    
   ];
 
   return (

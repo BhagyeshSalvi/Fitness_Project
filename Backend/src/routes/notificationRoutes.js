@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const notificationController = require('../controllers/notificationController');
+const controller = require('../controllers/notificationController'); // ✅ correct path
 
-router.get('/:userId', notificationController.getPreferences);
-router.post('/', notificationController.savePreferences);
+router.get('/:userId', controller.getPreferences);
+router.post('/', controller.savePreferences);
+router.put('/', controller.updateNotificationSettings);
 
 module.exports = router;
