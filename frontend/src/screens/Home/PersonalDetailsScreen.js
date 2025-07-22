@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
 import { API_URL } from '@env';
+import { useNavigation } from '@react-navigation/native';
 
 const PersonalDetailsScreen = () => {
   const [details, setDetails] = useState({
@@ -14,6 +15,8 @@ const PersonalDetailsScreen = () => {
     goal: '',
     activity_level: '',
   });
+
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchPersonalDetails = async () => {
@@ -69,6 +72,13 @@ const PersonalDetailsScreen = () => {
           <Text style={styles.value}>{details.activity_level}</Text>
         </View>
       </View>
+
+      <TouchableOpacity
+        style={styles.editButton}
+        onPress={() => navigation.navigate('EditPersonalDetails')}
+      >
+        <Text style={styles.editButtonText}>Edit Details</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -110,6 +120,19 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontFamily: 'Ponomar-Regular',
     marginTop: 2,
+  },
+  editButton: {
+    backgroundColor: '#008080',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 30,
+  },
+  editButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontFamily: 'Ponomar-Regular',
+    fontWeight: 'bold',
   },
 });
 

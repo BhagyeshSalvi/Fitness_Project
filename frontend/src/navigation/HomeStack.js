@@ -11,6 +11,7 @@ import LogActivityScreen from "../screens/Home/LogActivityScreen";
 import ProfileDetailsScreen from '../screens/Home/ProfileDetailsScreen';
 import PersonalDetailsScreen from '../screens/Home/PersonalDetailsScreen';
 import ChangePasswordScreen from '../screens/Home/ChangePasswordScreen';
+import EditPersonalDetailsScreen from '../screens/Home/EditPersonalDetailsScreen';
 import { Ionicons } from "@expo/vector-icons";
 
 const Tab = createBottomTabNavigator();
@@ -47,6 +48,7 @@ const SettingsStackNavigator = ({ setIsAuthenticated }) => {
       <Stack.Screen name="ProfileDetails" component={ProfileDetailsScreen} />
       <Stack.Screen name="PersonalDetails" component={PersonalDetailsScreen} />
       <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
+      <Stack.Screen name="EditPersonalDetails" component={EditPersonalDetailsScreen} />
     </Stack.Navigator>
   );
 };
