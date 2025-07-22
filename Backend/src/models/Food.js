@@ -118,7 +118,28 @@ const Food = {
                 });
             });
         });
-    }
+    },
+
+
+    // ✅ Get all unique food log dates for a user
+    getLoggedDates: (userId) => {
+    return new Promise((resolve, reject) => {
+        const query = `
+            SELECT DISTINCT DATE(date) as log_date 
+            FROM food_entries 
+            WHERE user_id = ?
+        `;
+        connection.query(query, [userId], (err, results) => {
+            if (err) {
+                console.error("❌ Database Error (getLoggedDates):", err);
+                reject(err);
+            } else {
+                resolve(results.map(r => r.log_date));
+            }
+        });
+    });
+}
+
     
 };
 module.exports = Food;

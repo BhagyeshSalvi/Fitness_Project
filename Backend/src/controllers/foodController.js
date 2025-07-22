@@ -188,6 +188,26 @@ exports.deleteFood = async (req, res) => {
     }
 };
 
+exports.getLoggedDates = async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        const dates = await Food.getLoggedDates(userId);
+
+        // Convert to Calendar format
+        const markedDates = {};
+        dates.forEach(date => {
+            markedDates[date] = { marked: true, dotColor: 'green' };
+        });
+
+        res.status(200).json({ markedDates });
+    } catch (error) {
+        console.error("❌ Error fetching logged dates:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+
 
 
 //  Format Nutritionix API Response
