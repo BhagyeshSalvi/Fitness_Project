@@ -7,6 +7,8 @@ const workoutRoutes = require('./routes/workoutRoutes');
 const foodRoutes = require('./routes/foodRoutes')
 const personalDetailsRoutes = require('./routes/personalDetailsRoutes')
 const activityLogRoutes = require('./routes/activityRoutes')
+const notificationRoutes = require('./routes/notificationRoutes');
+
 const app = express();
 
 // Middleware
@@ -27,6 +29,8 @@ app.use('/api/workout',workoutRoutes);
 app.use('/api/food', foodRoutes)
 app.use('/api/personalDetails', personalDetailsRoutes)
 app.use('/api/activity', activityLogRoutes)
+app.use('/api/notifications', notificationRoutes);
+
 
 
 // Start the server
