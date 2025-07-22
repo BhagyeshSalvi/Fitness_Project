@@ -41,7 +41,9 @@
     "react-native-svg": "15.11.2",
     "react-native-swiper": "^1.6.0",
     "react-native-vector-icons": "^10.2.0",
-    "undefined": "\\"
+    "undefined": "\\",
+    "expo-notifications": "~0.31.4",
+    "expo-device": "~7.1.4"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

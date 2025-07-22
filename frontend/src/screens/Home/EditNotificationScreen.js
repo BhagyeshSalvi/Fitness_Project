@@ -5,6 +5,11 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { jwtDecode } from 'jwt-decode';
 import { API_URL } from '@env';
+import {
+  requestNotificationPermission,
+  clearAllScheduledNotifications,
+  scheduleReminder
+} from '../../utils/notificationHelper';
 
 const EditNotificationScreen = ({ navigation }) => {
   const [userId, setUserId] = useState(null);
@@ -71,7 +76,30 @@ const EditNotificationScreen = ({ navigation }) => {
         workout_reminder_time: `${workoutHour}:${workoutMinute}`,
       });
 
-      Alert.alert("Preferences updated successfully!");
+      const permissionGranted = await requestNotificationPermission();
+      if (permissionGranted) {
+        await clearAllScheduledNotifications();
+
+        if (mealReminder) {
+          await scheduleReminder(
+            parseInt(mealHour),
+            parseInt(mealMinute),
+            '🍽️ Meal Reminder',
+            'It’s time for your scheduled meal.'
+          );
+        }
+
+        if (workoutReminder) {
+          await scheduleReminder(
+            parseInt(workoutHour),
+            parseInt(workoutMinute),
+            '💪 Workout Reminder',
+            'Time to get moving with your workout!'
+          );
+        }
+      }
+
+      Alert.alert("Preferences updated & reminders scheduled!");
       navigation.goBack();
     } catch (err) {
       console.error("❌ Error updating preferences:", err);
@@ -79,25 +107,26 @@ const EditNotificationScreen = ({ navigation }) => {
     }
   };
 
-  const renderTimePicker = (label, hour, setHour, minute, setMinute) => {
-    const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
-    const minutes = ['00', '15', '30', '45'];
+ const renderTimePicker = (label, hour, setHour, minute, setMinute) => {
+  const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
+  const minutes = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0')); // ✅ updated here
 
-    return (
-      <View style={styles.timePickerContainer}>
-        <Text style={styles.pickerLabel}>{label} Time</Text>
-        <View style={styles.pickerRow}>
-          <Picker selectedValue={hour} onValueChange={setHour} style={styles.picker}>
-            {hours.map(h => <Picker.Item key={h} label={h} value={h} />)}
-          </Picker>
-          <Text style={styles.colon}>:</Text>
-          <Picker selectedValue={minute} onValueChange={setMinute} style={styles.picker}>
-            {minutes.map(m => <Picker.Item key={m} label={m} value={m} />)}
-          </Picker>
-        </View>
+  return (
+    <View style={styles.timePickerContainer}>
+      <Text style={styles.pickerLabel}>{label} Time</Text>
+      <View style={styles.pickerRow}>
+        <Picker selectedValue={hour} onValueChange={setHour} style={styles.picker}>
+          {hours.map(h => <Picker.Item key={h} label={h} value={h} />)}
+        </Picker>
+        <Text style={styles.colon}>:</Text>
+        <Picker selectedValue={minute} onValueChange={setMinute} style={styles.picker}>
+          {minutes.map(m => <Picker.Item key={m} label={m} value={m} />)}
+        </Picker>
       </View>
-    );
-  };
+    </View>
+  );
+};
+
 
   return (
     <View style={styles.container}>
